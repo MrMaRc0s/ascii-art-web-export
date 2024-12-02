@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Art Generator</title>
+    <style>
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(120deg, #4b6cb7, #182848, #243b55);
+            background-size: 200% 200%;
+            animation: gradientAnimation 10s ease infinite;
+            color: #f5f5f5;
+        }
+
+        h1 {
+            margin-top: 20px;
+            z-index: 1;
+        }
+
+        form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        label, h3 {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        .radio-group, .alignment-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #61dafb;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #333;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #21a1f1;
+        }
+
+        #result-container {
+            display: block;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            width: 100%;
+            max-width: none;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        #ascii-title {
+            text-align: center;
+        }
+
+        #ascii-output {
+            padding: 10px;
+            white-space: pre;
+            font-family: monospace;
+            font-size: 16px;
+            line-height: 1.2;
+        }
+    </style>
+    <script>
+        async function generateAsciiArt(event) {
+            event.preventDefault();
+
+            // Collect all form data
+            const text = document.getElementById('text').value;
+            const banner = document.querySelector('input[name="banner"]:checked').value;
+            const alignment = document.querySelector('input[name="alignment"]:checked').value;
+            const color = document.getElementById('color').value;
+
+            try {
+                // send data to the server
+                const formData = new URLSearchParams();
+                formData.append('text', text);
+                formData.append('banner', banner);
+                formData.append('alignment', alignment);
+                formData.append('color', color);
+
+                // Send POST request to the server
+                const response = await fetch('/ascii-art', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData.toString()
+                });
+
+                // Check for server response
+                if (!response.ok) {
+                    const errorMsg = await response.text();
+                    throw new Error(errorMsg);
+                }
+
+                const asciiArt = await response.text();
+                const asciiOutput = document.getElementById('ascii-output');
+                asciiOutput.textContent = asciiArt;
+
+                // Apply alignment and color
+                asciiOutput.style.textAlign = alignment;
+                asciiOutput.style.color = color;
+
+                document.getElementById('result-container').style.display = 'block';
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+        function exportAsciiArt() {
+        const asciiOutput = document.getElementById('ascii-output').textContent;
+
+        if (!asciiOutput.trim()) {
+            alert('Please generate ASCII art before downloading.');
+            return;
+        }
+
+        // Create a Blob containing the ASCII art text
+        const blob = new Blob([asciiOutput], { type: 'text/plain' });
+
+        // Create a download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = 'ascii_art.txt'; // Default file name
+        downloadLink.style.display = 'none';
+
+        // Append link to the body and trigger click
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+
+        // Remove link after download
+        document.body.removeChild(downloadLink);
+    }
+    function prepareDownload() {
+            const text = document.getElementById('text').value;
+            const banner = document.querySelector('input[name="banner"]:checked').value;
+    
+            if (!text.trim()) {
+                alert('Please enter some text to generate ASCII art.');
+                return;
+            }
+    
+            document.getElementById('hidden-text').value = text;
+            document.getElementById('hidden-banner').value = banner;
+    
+            document.querySelector('form[action="/download-ascii-art"]').submit();
+        }
+    </script>
+</head>
+<body>
+    <h1>ASCII Art Generator</h1>
+    <form onsubmit="generateAsciiArt(event)">
+        <label for="text">Enter Text:</label>
+        <input type="text" id="text" name="text" required placeholder="Type your text here">
+
+        <h3>Select Banner Style</h3>
+        <div class="radio-group">
+            <label for="standard">
+                <input type="radio" id="standard" name="banner" value="standard" checked> Standard
+            </label>
+            <label for="shadow">
+                <input type="radio" id="shadow" name="banner" value="shadow"> Shadow
+            </label>
+            <label for="thinkertoy">
+                <input type="radio" id="thinkertoy" name="banner" value="thinkertoy"> Thinkertoy
+            </label>
+        </div>
+
+        <h3>Select Alignment</h3>
+        <div class="alignment-group">
+            <label for="align-left">
+                <input type="radio" id="align-left" name="alignment" value="left" checked> Left
+            </label>
+            <label for="align-center">
+                <input type="radio" id="align-center" name="alignment" value="center"> Center
+            </label>
+            <label for="align-right">
+                <input type="radio" id="align-right" name="alignment" value="right"> Right
+            </label>
+        </div>
+
+        <h3>Select Color</h3>
+        <select id="color" name="color">
+            <option value="#ffffff" selected>White</option>
+            <option value="#ff0000">Red</option>
+            <option value="#00ff00">Green</option>
+            <option value="#0000ff">Blue</option>
+            <option value="#ffff00">Yellow</option>
+            <option value="#ff00ff">Magenta</option>
+            <option value="#00ffff">Cyan</option>
+            <option value="#000000">Black</option>
+        </select>
+
+        <button type="submit">Generate ASCII Art</button>
+        <button type="button" onclick="exportAsciiArt()">Download ASCII Art</button>
+    </form>
+
+    <form action="/download-ascii-art" method="post" target="_blank">
+        <input type="hidden" name="text" id="hidden-text">
+        <input type="hidden" name="banner" id="hidden-banner">
+        <button type="button" onclick="prepareDownload()">Download ASCII Art</button>
+    </form>
+    
+    <div id="result-container">
+        <h2 id="ascii-title">Generated ASCII Art</h2>
+        <pre id="ascii-output"></pre>
+    </div>
+</body>
+</html>
