@@ -97,53 +97,53 @@
             line-height: 1.2;
         }
     </style>
-    <script>
-        async function generateAsciiArt(event) {
-            event.preventDefault();
+<script>
+    async function generateAsciiArt(event) {
+        event.preventDefault();
 
-            // Collect all form data
-            const text = document.getElementById('text').value;
-            const banner = document.querySelector('input[name="banner"]:checked').value;
-            const alignment = document.querySelector('input[name="alignment"]:checked').value;
-            const color = document.getElementById('color').value;
+        const text = document.getElementById('text').value;
+        const banner = document.querySelector('input[name="banner"]:checked').value;
+        const alignment = document.querySelector('input[name="alignment"]:checked').value;
+        const color = document.getElementById('color').value;
 
-            try {
-                // send data to the server
-                const formData = new URLSearchParams();
-                formData.append('text', text);
-                formData.append('banner', banner);
-                formData.append('alignment', alignment);
-                formData.append('color', color);
+        try {
+            const formData = new URLSearchParams();
+            formData.append('text', text);
+            formData.append('banner', banner);
+            formData.append('alignment', alignment);
+            formData.append('color', color);
 
-                // Send POST request to the server
-                const response = await fetch('/ascii-art', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: formData.toString()
-                });
+            const response = await fetch('/ascii-art', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData.toString()
+            });
 
-                // Check for server response
-                if (!response.ok) {
-                    const errorMsg = await response.text();
-                    throw new Error(errorMsg);
-                }
-
-                const asciiArt = await response.text();
-                const asciiOutput = document.getElementById('ascii-output');
-                asciiOutput.textContent = asciiArt;
-
-                // Apply alignment and color
-                asciiOutput.style.textAlign = alignment;
-                asciiOutput.style.color = color;
-
-                document.getElementById('result-container').style.display = 'block';
-            } catch (error) {
-                alert(`Error: ${error.message}`);
+            if (!response.ok) {
+                const errorMsg = await response.text();
+                throw new Error(errorMsg);
             }
+
+            const asciiArt = await response.text();
+            const asciiOutput = document.getElementById('ascii-output');
+            asciiOutput.textContent = asciiArt;
+
+            // Apply alignment and color
+            asciiOutput.style.textAlign = alignment;
+            asciiOutput.style.color = color;
+
+            document.getElementById('result-container').style.display = 'block';
+
+            // Show the download button
+            document.getElementById('download-container').style.display = 'block';
+        } catch (error) {
+            alert(`Error: ${error.message}`);
         }
-        function exportAsciiArt() {
+    }
+
+    function exportAsciiArt() {
         const asciiOutput = document.getElementById('ascii-output').textContent;
 
         if (!asciiOutput.trim()) {
@@ -151,37 +151,18 @@
             return;
         }
 
-        // Create a Blob containing the ASCII art text
         const blob = new Blob([asciiOutput], { type: 'text/plain' });
-
-        // Create a download link
         const downloadLink = document.createElement('a');
         downloadLink.href = URL.createObjectURL(blob);
-        downloadLink.download = 'ascii_art.txt'; // Default file name
+        downloadLink.download = 'ascii_art.txt';
         downloadLink.style.display = 'none';
 
-        // Append link to the body and trigger click
         document.body.appendChild(downloadLink);
         downloadLink.click();
-
-        // Remove link after download
         document.body.removeChild(downloadLink);
     }
-    function prepareDownload() {
-            const text = document.getElementById('text').value;
-            const banner = document.querySelector('input[name="banner"]:checked').value;
-    
-            if (!text.trim()) {
-                alert('Please enter some text to generate ASCII art.');
-                return;
-            }
-    
-            document.getElementById('hidden-text').value = text;
-            document.getElementById('hidden-banner').value = banner;
-    
-            document.querySelector('form[action="/download-ascii-art"]').submit();
-        }
-    </script>
+</script>
+
 </head>
 <body>
     <h1>ASCII Art Generator</h1>
@@ -228,13 +209,9 @@
         </select>
 
         <button type="submit">Generate ASCII Art</button>
-        <button type="button" onclick="exportAsciiArt()">Download ASCII Art</button>
-    </form>
-
-    <form action="/download-ascii-art" method="post" target="_blank">
-        <input type="hidden" name="text" id="hidden-text">
-        <input type="hidden" name="banner" id="hidden-banner">
-        <button type="button" onclick="prepareDownload()">Download ASCII Art</button>
+        <div id="download-container" style="display: none;">
+            <button type="button" onclick="exportAsciiArt()">Download ASCII Art</button>
+        </div>
     </form>
     
     <div id="result-container">
