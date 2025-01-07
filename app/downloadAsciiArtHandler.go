@@ -1,6 +1,9 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+	"strconv"
+)
 
 func downloadAsciiArtHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -24,9 +27,13 @@ func downloadAsciiArtHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	artLength := len(artResult)
+
 	// Serve ASCII art as a downloadable file
 	w.Header().Set("Content-Disposition", "attachment; filename=ascii_art.txt")
 	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Length", strconv.Itoa(artLength))
+
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(artResult))
 }

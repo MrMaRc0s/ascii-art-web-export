@@ -15,6 +15,7 @@ func (c *customMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	validPaths := map[string]bool{
 		"/":          true,
 		"/ascii-art": true,
+		//"/download-ascii-art": true, //curl -X POST -d "text=text&banner=standard" -i http://localhost:8080/download-ascii-art
 	}
 
 	// Check if the requested path is valid
@@ -51,4 +52,5 @@ func main() {
 		fmt.Printf("\rServer is running on http://localhost:%v ", port)
 		err = http.ListenAndServe(fmt.Sprintf(":%d", port), wrappedMux)
 	}
+
 }
