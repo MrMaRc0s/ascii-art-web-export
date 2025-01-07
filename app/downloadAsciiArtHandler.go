@@ -1,6 +1,8 @@
 package main
 
 import (
+	"archive/zip"
+	"bytes"
 	"net/http"
 	"strconv"
 )
@@ -27,13 +29,34 @@ func downloadAsciiArtHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	artLength := len(artResult)
+	// Create a buffer to store the ZIP file in memory
+	var buf bytes.Buffer
+	zipWriter := zip.NewWriter(&buf)
 
-	// Serve ASCII art as a downloadable file
-	w.Header().Set("Content-Disposition", "attachment; filename=ascii_art.txt")
-	w.Header().Set("Content-Type", "text/plain")
-	w.Header().Set("Content-Length", strconv.Itoa(artLength))
+	// Add the ASCII art as a file in the ZIP archive
+	zipFile, err := zipWriter.Create("ascii_art.txt")
+	if err != nil {
+		http.Error(w, "Internal Server Error - Unable to create ZIP file", http.StatusInternalServerError)
+		return
+	}
+	_, err = zipFile.Write([]byte(artResult))
+	if err != nil {
+		http.Error(w, "Internal Server Error - Unable to write to ZIP file", http.StatusInternalServerError)
+		return
+	}
+
+	// Close the ZIP writer to finalize the archive
+	err = zipWriter.Close()
+	if err != nil {
+		http.Error(w, "Internal Server Error - Unable to finalize ZIP file", http.StatusInternalServerError)
+		return
+	}
+
+	// Serve the ZIP file as a downloadable file
+	w.Header().Set("Content-Disposition", "attachment; filename=ascii_art.zip")
+	w.Header().Set("Content-Type", "application/zip")
+	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(artResult))
+	w.Write(buf.Bytes())
 }
