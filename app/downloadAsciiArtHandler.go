@@ -19,6 +19,15 @@ func downloadAsciiArtHandler(w http.ResponseWriter, r *http.Request) {
 
 	inputText := r.FormValue("text")
 	banner := r.FormValue("banner")
+	if inputText == "" {
+		http.Error(w, "Bad Request - Empty Text", http.StatusBadRequest)
+		return
+	}
+
+	if banner != "standard" && banner != "shadow" && banner != "thinkertoy" {
+		http.Error(w, "Bad Request - Invalid banner template", http.StatusBadRequest)
+		return
+	}
 
 	// Generate ASCII art
 	artResult, err := GenerateAsciiArt(inputText, banner)

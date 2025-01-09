@@ -33,7 +33,7 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Check if the text is not empty
 	if inputText == "" {
-		http.Error(w, "type something", http.StatusBadRequest)
+		http.Error(w, "Bad Request - Empty Text", http.StatusBadRequest)
 		return
 	}
 
