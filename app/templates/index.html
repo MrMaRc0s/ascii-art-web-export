@@ -138,35 +138,55 @@
 
             // Show the download button
             document.getElementById('download-container').style.display = 'block';
+
+            document.getElementById('hidden-text').value = document.getElementById('text').value;
+            document.getElementById('hidden-banner').value = document.querySelector('input[name="banner"]:checked').value;
         } catch (error) {
             alert(`Error: ${error.message}`);
         }
     }
 
-    function exportAsciiArt() {
-        const asciiOutput = document.getElementById('ascii-output').textContent;
+//     async function downloadAsciiArt() {
+//         const text = document.getElementById('text').value;
+//         const banner = document.querySelector('input[name="banner"]:checked').value;
 
-        if (!asciiOutput.trim()) {
-            alert('Please generate ASCII art before downloading.');
-            return;
-        }
+//         try {
+//             const formData = new URLSearchParams();
+//             formData.append('text', text);
+//             formData.append('banner', banner);
 
-        const blob = new Blob([asciiOutput], { type: 'text/plain' });
-        const downloadLink = document.createElement('a');
-        downloadLink.href = URL.createObjectURL(blob);
-        downloadLink.download = 'ascii_art.txt';
-        downloadLink.style.display = 'none';
+//             const response = await fetch('/download-ascii-art', {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/x-www-form-urlencoded'
+//                 },
+//                 body: formData.toString()
+//             });
 
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-    }
-</script>
+//             if (!response.ok) {
+//                 const errorMsg = await response.text();
+//                 throw new Error(errorMsg);
+//             }
+
+//             const blob = await response.blob();
+//             const url = window.URL.createObjectURL(blob);
+//             const link = document.createElement('a');
+//             link.href = url;
+//             link.download = 'ascii_art.txt';
+//             document.body.appendChild(link);
+//             link.click();
+//             document.body.removeChild(link);
+//         } catch (error) {
+//             alert(`Error: ${error.message}`);
+//         }
+//     }
+ </script>
 
 </head>
 <body>
     <h1>ASCII Art Generator</h1>
-    <form onsubmit="generateAsciiArt(event)">
+    <!-- Main form for generating ASCII art -->
+    <form id="generate-form" onsubmit="generateAsciiArt(event)">
         <label for="text">Enter Text:</label>
         <input type="text" id="text" name="text" required placeholder="Type your text here">
 
@@ -209,14 +229,20 @@
         </select>
 
         <button type="submit">Generate ASCII Art</button>
-        <div id="download-container" style="display: none;">
-            <button type="button" onclick="exportAsciiArt()">Download ASCII Art</button>
-        </div>
     </form>
-    
+
+    <div id="download-container" style="display: none;">
+        <form action="/download-ascii-art" method="POST">
+            <input type="hidden" name="text" id="hidden-text">
+            <input type="hidden" name="banner" id="hidden-banner">
+            <button type="submit">Download ASCII Art</button>
+        </form>
+    </div>
+
+    <!-- Result container -->
     <div id="result-container">
         <h2 id="ascii-title">Generated ASCII Art</h2>
         <pre id="ascii-output"></pre>
     </div>
 </body>
-</html>
+

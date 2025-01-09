@@ -13,9 +13,9 @@ type customMux struct {
 func (c *customMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// List of valid paths
 	validPaths := map[string]bool{
-		"/":          true,
-		"/ascii-art": true,
-		//"/download-ascii-art": true, //curl -X POST -d "text=text&banner=standard" -i http://localhost:8080/download-ascii-art
+		"/":                   true,
+		"/ascii-art":          true,
+		"/download-ascii-art": true, //curl -X POST -d "text=text&banner=standard" -i http://localhost:8080/download-ascii-art
 	}
 
 	// Check if the requested path is valid
