@@ -13,10 +13,9 @@ type customMux struct {
 func (c *customMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// List of valid paths
 	validPaths := map[string]bool{
-		"/":                       true,
-		"/ascii-art":              true,
-		"/download-ascii-art-pdf": true, //curl -X POST -d "text=text&banner=standard" -i http://localhost:8080/download-ascii-art
-		"/download-ascii-art":     true,
+		"/":                   true,
+		"/ascii-art":          true,
+		"/download-ascii-art": true, //curl -X POST -d "text=text&banner=standard" -i http://localhost:8080/download-ascii-art
 	}
 	// Check if the requested path is valid
 	if !validPaths[r.URL.Path] {
@@ -31,9 +30,10 @@ func main() {
 	mux := http.NewServeMux()
 	// Register the main page handler for the root path
 	mux.HandleFunc("/", mainPage)
+
 	// Register the /download-ascii-art handler for the export
-	mux.HandleFunc("/download-ascii-art-pdf", downloadAsciiArtHandlerPdf)
 	mux.HandleFunc("/download-ascii-art", downloadAsciiArtHandler)
+
 	// Register the /ascii-art handler for POST requests
 	mux.HandleFunc("/ascii-art", asciiArtHandler)
 	// Wrap the mux in our customMux to handle 404 errors
