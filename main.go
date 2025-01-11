@@ -13,9 +13,10 @@ type customMux struct {
 func (c *customMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// List of valid paths
 	validPaths := map[string]bool{
-		"/":                   true,
-		"/ascii-art":          true,
-		"/download-ascii-art": true, //curl -X POST -d "text=text&banner=standard" -i http://localhost:8080/download-ascii-art
+		"/":                       true,
+		"/ascii-art":              true,
+		"/download-ascii-art-pdf": true, //curl -X POST -d "text=text&banner=standard" -i http://localhost:8080/download-ascii-art
+		"/download-ascii-art":     true,
 	}
 
 	// Check if the requested path is valid
@@ -36,6 +37,7 @@ func main() {
 	mux.HandleFunc("/", mainPage)
 
 	// Register the /download-ascii-art handler for the export
+	mux.HandleFunc("/download-ascii-art-pdf", downloadAsciiArtHandlerPdf)
 	mux.HandleFunc("/download-ascii-art", downloadAsciiArtHandler)
 
 	// Register the /ascii-art handler for POST requests

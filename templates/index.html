@@ -96,6 +96,7 @@
             font-size: 16px;
             line-height: 1.2;
         }
+        
     </style>
 <script>
     async function generateAsciiArt(event) {
@@ -159,6 +160,24 @@
         <button type="submit">Generate ASCII Art</button>
     </form>
 
+    <form action="/download-ascii-art-pdf" method="POST">
+        <input type="hidden" name="textpdf" id="hidden-textpdf">
+        <input type="hidden" name="bannerpdf" id="hidden-bannerpdf">
+        <button type="submit" id="downloadButtonpdf" 
+            onclick="
+            const inputTextpdf = document.getElementById('text').value;
+            const bannerpdf = document.querySelector('input[name=&quot;banner&quot;]:checked')?.value;
+    
+            document.getElementById('hidden-textpdf').value = inputTextpdf;
+            document.getElementById('hidden-bannerpdf').value = bannerpdf;
+            if (!inputTextpdf) {
+                alert('You can not download an empty text.');
+                return false; // Prevent form submission
+            }
+        ">
+            Download ASCII Art as pdf
+        </button>
+    </form>
     <form action="/download-ascii-art" method="POST">
         <input type="hidden" name="text" id="hidden-text">
         <input type="hidden" name="banner" id="hidden-banner">
@@ -174,7 +193,7 @@
                 return false; // Prevent form submission
             }
         ">
-            Download ASCII Art
+            Download ASCII Art as txt
         </button>
     </form>
 
