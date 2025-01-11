@@ -103,16 +103,12 @@
 
         const text = document.getElementById('text').value;
         const banner = document.querySelector('input[name="banner"]:checked').value;
-        const alignment = document.querySelector('input[name="alignment"]:checked').value;
-        const color = document.getElementById('color').value;
 
         document.getElementById('result-container').style.display = 'block';
         try {
             const formData = new URLSearchParams();
             formData.append('text', text);
             formData.append('banner', banner);
-            formData.append('alignment', alignment);
-            formData.append('color', color);
 
             const response = await fetch('/ascii-art', {
                 method: 'POST',
@@ -130,10 +126,6 @@
             const asciiArt = await response.text();
             const asciiOutput = document.getElementById('ascii-output');
             asciiOutput.textContent = asciiArt;
-
-            // Apply alignment and color
-            asciiOutput.style.textAlign = alignment;
-            asciiOutput.style.color = color;
 
             document.getElementById('result-container').style.display = 'block';
 
@@ -163,31 +155,6 @@
                 <input type="radio" id="thinkertoy" name="banner" value="thinkertoy"> Thinkertoy
             </label>
         </div>
-
-        <h3>Select Alignment</h3>
-        <div class="alignment-group">
-            <label for="align-left">
-                <input type="radio" id="align-left" name="alignment" value="left" checked> Left
-            </label>
-            <label for="align-center">
-                <input type="radio" id="align-center" name="alignment" value="center"> Center
-            </label>
-            <label for="align-right">
-                <input type="radio" id="align-right" name="alignment" value="right"> Right
-            </label>
-        </div>
-
-        <h3>Select Color</h3>
-        <select id="color" name="color">
-            <option value="#ffffff" selected>White</option>
-            <option value="#ff0000">Red</option>
-            <option value="#00ff00">Green</option>
-            <option value="#0000ff">Blue</option>
-            <option value="#ffff00">Yellow</option>
-            <option value="#ff00ff">Magenta</option>
-            <option value="#00ffff">Cyan</option>
-            <option value="#000000">Black</option>
-        </select>
 
         <button type="submit">Generate ASCII Art</button>
     </form>
