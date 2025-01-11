@@ -10,7 +10,6 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
@@ -23,12 +22,10 @@
             animation: gradientAnimation 10s ease infinite;
             color: #f5f5f5;
         }
-
         h1 {
             margin-top: 20px;
             z-index: 1;
         }
-
         form:first-of-type {
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
@@ -38,12 +35,10 @@
             width: 100%;
             z-index: 1;
         }
-
         label, h3 {
             display: block;
             margin: 10px 0 5px;
         }
-
         input[type="text"], select {
             width: 100%;
             padding: 8px;
@@ -52,13 +47,11 @@
             font-size: 1em;
             margin-bottom: 10px;
         }
-
         .radio-group, .alignment-group {
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
         }
-
         button {
             margin-top: 10px;
             padding: 10px 20px;
@@ -69,11 +62,9 @@
             color: #333;
             font-weight: bold;
         }
-
         button:hover {
             background-color: #21a1f1;
         }
-
         #result-container {
             display: block;
             margin-top: 20px;
@@ -84,11 +75,9 @@
             overflow-x: auto;
             white-space: nowrap;
         }
-
         #ascii-title {
             text-align: center;
         }
-
         #ascii-output {
             padding: 10px;
             white-space: pre;
@@ -96,20 +85,18 @@
             font-size: 16px;
             line-height: 1.2;
         }
+        
     </style>
 <script>
     async function generateAsciiArt(event) {
         event.preventDefault();
-
         const text = document.getElementById('text').value;
         const banner = document.querySelector('input[name="banner"]:checked').value;
-
         document.getElementById('result-container').style.display = 'block';
         try {
             const formData = new URLSearchParams();
             formData.append('text', text);
             formData.append('banner', banner);
-
             const response = await fetch('/ascii-art', {
                 method: 'POST',
                 headers: {
@@ -117,32 +104,25 @@
                 },
                 body: formData.toString()
             });
-
             if (!response.ok) {
                 const errorMsg = await response.text();
                 throw new Error(errorMsg);
             }
-
             const asciiArt = await response.text();
             const asciiOutput = document.getElementById('ascii-output');
             asciiOutput.textContent = asciiArt;
-
             document.getElementById('result-container').style.display = 'block';
-
         } catch (error) {
             alert(`Error: ${error.message}`);
         }
     }
-
  </script>
-
 </head>
 <body>
     <h1>ASCII Art Generator</h1>
     <form id="generate-form" onsubmit="generateAsciiArt(event)">
         <label for="text">Enter Text:</label>
         <input type="text" id="text" name="text" required placeholder="Type your text here">
-
         <h3>Select Banner Style</h3>
         <div class="radio-group">
             <label for="standard">
@@ -155,10 +135,26 @@
                 <input type="radio" id="thinkertoy" name="banner" value="thinkertoy"> Thinkertoy
             </label>
         </div>
-
         <button type="submit">Generate ASCII Art</button>
     </form>
-
+    <form action="/download-ascii-art-pdf" method="POST">
+        <input type="hidden" name="textpdf" id="hidden-textpdf">
+        <input type="hidden" name="bannerpdf" id="hidden-bannerpdf">
+        <button type="submit" id="downloadButtonpdf" 
+            onclick="
+            const inputTextpdf = document.getElementById('text').value;
+            const bannerpdf = document.querySelector('input[name=&quot;banner&quot;]:checked')?.value;
+    
+            document.getElementById('hidden-textpdf').value = inputTextpdf;
+            document.getElementById('hidden-bannerpdf').value = bannerpdf;
+            if (!inputTextpdf) {
+                alert('You can not download an empty text.');
+                return false; // Prevent form submission
+            }
+        ">
+            Download ASCII Art as pdf
+        </button>
+    </form>
     <form action="/download-ascii-art" method="POST">
         <input type="hidden" name="text" id="hidden-text">
         <input type="hidden" name="banner" id="hidden-banner">
@@ -174,14 +170,12 @@
                 return false; // Prevent form submission
             }
         ">
-            Download ASCII Art
+            Download ASCII Art as txt
         </button>
     </form>
-
     <!-- Result container -->
     <div id="result-container" style="display: none;">
         <h2 id="ascii-title">Generated ASCII Art</h2>
         <pre id="ascii-output"></pre>
     </div>
 </body>
-
