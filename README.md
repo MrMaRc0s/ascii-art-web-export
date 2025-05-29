@@ -24,7 +24,7 @@ The ASCII Art Generator is a web-based application that allows users to create b
 1. Clone this repository:
    ```bash
    git clone https://github.com/MrMaRc0s/ascii-art-web-export/
-   cd ascii-art-generator
+   cd ascii-art-web-export
    ```
 
 2. Run the server:
